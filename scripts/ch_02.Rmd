@@ -1,0 +1,245 @@
+---
+title: "第2章　中央値"
+# subtitle: "中央値"
+# author: "MOMOZUKA Kaoru"
+#date: "2024/7/16"
+output:
+  pdf_document:
+    highlight: tango
+    latex_engine: xelatex
+    toc: false
+    keep_tex: true
+    number_section: true
+    #fig_width: 3
+    #fig_height: 2.5
+    includes:
+        in_header: preamble_02.tex
+  html_document:
+    toc: false
+    df_print: paged
+header-includes:
+- \usepackage{zxjatype}
+- \usepackage[ipa]{zxjafont}
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+    \lhead{momozuka@gmail.com} %ヘッダ左
+documentclass: bxjsarticle
+# classoption: xelatex,ja=standard
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = FALSE, dev = "ragg_png", dpi = 300)
+```
+
+# 中央値
+
+## 準備
+
+### 必要なライブラリをインストールする
+
+下の行はconsoleで実行すると良い。
+
+```
+# code
+install.packages("tidyverse")
+
+```
+
+
+### 必要なライブラリを読み込む
+
+```{r results = "hide", message = FALSE}
+# code
+library(tidyverse)
+library(systemfonts)
+library(ragg)
+```
+## 中央値を求める
+
+### 中央値とは何か
+
+> 「中央値とは文字どおり、データの「頁ん中」にある値という意味で、データを小さい順（もしくは大きい順） に並べたときに、ちょうど真ん中にくる値です。」（テキスト 13）
+
+### データを入力する
+
+ここでは、CSVファイルを作成してアップロードして使用する。
+
+CSVファイル名の例: `zenki_chap_02_01_utf8.csv`
+
+ファイルの中身
+
+```
+
+car_id,year_nen
+1,11
+2,1
+3,10
+（以下省略）
+
+```
+
+## データフレームの作成
+
+### read_(csv)の使用
+
+```{r}
+# code
+df_eigyousha <- read_csv("zenki_chap_02_01_utf8.csv")
+df_eigyousha
+```
+### データの確認
+
+```{r}
+# code
+glimpse(df_eigyousha)
+```
+### 変数の型の確認
+
+```{r}
+# code
+class(df_eigyousha)
+```
+
+`tibble`であることがわかります。
+
+
+### 平均値の確認
+
+```{r}
+# code
+mean(df_eigyousha$year_nen)
+```
+## 中央値を求める
+
+### median()
+
+中央値の関数は`mdeian()`です。Excelでも`MEDIAN()`を使いますので同じ名前です。
+
+`median()`を使う場合。
+
+```{r}
+# code
+median(df_eigyousha$year_nen)
+```
+### summarize()
+
+`summarize()`を使うこともできます。これは中央値を出すための関数ではありません。
+
+```{r}
+# code
+df_eigyousha |>
+  summarise(
+    median_value = median(year_nen)
+  )
+```
+
+平均値と中央値を並べて表示してみましょう。
+
+```{r}
+# code
+df_eigyousha |>
+  summarise(
+    mean_value = mean(year_nen),
+    median_value = median(year_nen)
+  )
+```
+
+
+
+\newpage
+
+## 章末問題
+
+### 問題
+
+以下のデータは、ある部吊の単価（円）を示したものです。中央値を求めてください。
+
+520、480、720、890、490、980、1500
+
+
+\newpage
+
+### 解答例
+
+### ベクトルを作成する場合
+
+```{r}
+# code
+data_buhin_tanka <- c(520, 480, 720, 890, 490, 980, 1500)
+
+
+```
+
+中央値を計算する。
+
+```{r}
+# code
+median(data_buhin_tanka)
+```
+
+
+### データフレームを作成する場合
+
+```{r}
+# code
+df_buhin_tanka <- tibble(
+  tanka_yen = c(520, 480, 720, 890, 490, 980, 1500)
+)
+df_buhin_tanka
+```
+
+中央値を計算する。
+
+```{r}
+# code
+median(df_buhin_tanka$tanka_yen)
+```
+
+
+### CSVファイルからデータフレームを作成する場合
+
+CSVファイル名の例: `zenki_chap_02_shoumatu_utf8.csv`
+
+CSVファイルの中身
+
+```
+tanka_yen
+520
+480
+720
+（以下省略）
+
+```
+
+データフレームの作成
+
+```{r}
+# code
+df_buhin_tanka2 <- read_csv("zenki_chap_02_shoumatu_utf8.csv")
+df_buhin_tanka2
+```
+
+中央値の計算
+
+```{r}
+# code
+median(df_buhin_tanka2$tanka_yen)
+```
+
+\newpage
+
+
+## テキストと参考文献
+
+### テキスト
+
+- 玄場公規, 湊宣明, 豊田裕貴, 2016, 『Excel で学ぶ ビジネスデータ分析の基礎ビジネス統計スペシャリスト・エクセル分析ベーシック対応』, オデッセイコミュニケーションズ. 
+
+
+### 参考文献
+
+- ウィッカム, 2024, 『Rではじめるデータサイエンス第2版』, オライリー・ジャパン.
+
+
+
