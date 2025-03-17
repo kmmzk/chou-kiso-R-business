@@ -1,0 +1,222 @@
+---
+title: "第3章　最頻値"
+#subtitle: "最頻値"
+#author: "MOMOZUKA Kaoru"
+#date: "2025/02/23"
+output:
+  pdf_document:
+    highlight: tango
+    latex_engine: xelatex
+    toc: false
+    keep_tex: true
+    number_section: true
+    #fig_width: 3
+    #fig_height: 2.5
+    includes:
+        in_header: preamble_03.tex
+  html_document:
+    toc: false
+    df_print: paged
+header-includes:
+- \usepackage{zxjatype}
+- \usepackage[ipa]{zxjafont}
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+    \lhead{momozuka@gmail.com} %ヘッダ左
+documentclass: bxjsarticle
+# classoption: xelatex,ja=standard
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = FALSE, dev = "ragg_png", dpi = 300)
+```
+
+# 最頻値
+
+## 必要なライブラリをインストールする
+
+下の行はconsoleで実行すると良い。
+
+```
+# console
+install.packages("tidyverse")
+
+```
+
+
+## 必要なライブラリを読み込む
+
+```{r results = "hide", message = FALSE}
+# code
+library(tidyverse)
+library(systemfonts)
+library(ragg)
+```
+
+##  最頻値が何かを知る（テキスト3.1）
+
+###  最頻値とは
+
+> 「データを大きい順に並べた際、同じ値のデータが複数あることは珍しくありません。このとき、もっとも個数の多いデータが最頻値」
+
+### データフレームの作成
+
+Rには最頻値を求める関数はない。
+
+社員の出張回数を出してみる。
+
+
+```{r}
+# code
+df_trip_counts <- tibble(
+  staff_name = c("A", "B", "C", "D", "E", "F"),
+  trip_counts = c(0, 6, 0, 0, 0, 0)
+)
+df_trip_counts
+```
+
+変数の型を確認しましょう。
+
+```{r}
+# code
+class(df_trip_counts)
+```
+
+`tibble`データフレームであることが分かります。
+
+```{r}
+# code
+class(df_trip_counts$staff_name)
+```
+
+`character`文字列なのが分かります。
+
+
+```{r}
+# code
+class(df_trip_counts$trip_counts)
+```
+
+`numeric`数値なのが分かります。
+
+
+### 平均を求めておく
+
+```{r}
+# code
+mean(df_trip_counts$trip_counts)
+```
+
+## 最頻値を求める（テキスト3.2）
+
+第2章で作成した「営業車使用年数. xlsx」のデータを使用する。
+
+### CSVファイル
+
+CSVファイル名の例: `zenki_chap_02_01_utf8.csv`
+
+CSVファイルの中身
+
+```
+
+car_id,year_nen
+1,11
+2,1
+3,10
+(以下省略)
+
+```
+
+### データフレームの作成
+
+```{r}
+# code
+df_eigyousha <- read_csv("zenki_chap_03_01_utf8.csv")
+glimpse(df_eigyousha)
+```
+
+
+## count()を使った最頻値の求め方
+
+最頻値の求め方には以下のようなものがある。
+
+- `count()`関数で各値の出現回数を集計
+- `slice_max()`関数で最も出現回数の多い行を抽出
+- `pull()`関数で最頻値を取得
+
+
+```{r}
+# code
+df_eigyousha |>
+  count(year_nen) |>
+  slice_max(n) |>
+  pull(year_nen)
+```
+
+なお、各関数の実行結果を表示しておく。
+
+```{r}
+# code
+df_eigyousha |>
+  count(year_nen)
+```
+
+
+```{r}
+# code
+df_eigyousha |>
+  count(year_nen) |>
+  slice_max(n)
+```
+
+\newpage
+
+## 章末問題
+
+### 問題
+
+以下のデータは、ある観光期におけるレストラン(11 店舗） のメニュー数を示したものです。最頻値を求めてください。
+
+
+\newpage
+
+### 解答例
+
+### データフレームの作成
+
+```{r}
+# code
+df_menu <- tibble(
+  menu = c(15, 9, 10, 24, 20, 18, 8, 35, 27, 10, 13)
+)
+glimpse(df_menu)
+```
+
+### 最頻値の計算
+
+```{r}
+# code
+df_menu |>
+  count(menu) |>
+  slice_max(n) |>
+  pull(menu)
+```
+
+答え: 10
+
+\newpage
+
+## テキストと参考文献
+
+### テキスト
+
+- 玄場公規, 湊宣明, 豊田裕貴, 2016, 『Excel で学ぶ ビジネスデータ分析の基礎ビジネス統計スペシャリスト・エクセル分析ベーシック対応』, オデッセイコミュニケーションズ. 
+
+
+### 参考文献
+
+- ウィッカム, 2024, 『Rではじめるデータサイエンス第2版』, オライリー・ジャパン.
+
+
+
