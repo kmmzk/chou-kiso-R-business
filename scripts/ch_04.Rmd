@@ -1,0 +1,310 @@
+---
+title: "第4章　レンジ"
+# subtitle: "レンジ"
+#author: "MOMOZUKA Kaoru"
+#date: "2025/02/24"
+output:
+  pdf_document:
+    highlight: tango
+    latex_engine: xelatex
+    toc: false
+    keep_tex: true
+    number_section: true
+    #fig_width: 3
+    #fig_height: 2.5
+    includes:
+        in_header: preamble_04.tex
+  html_document:
+    toc: false
+    df_print: paged
+header-includes:
+- \usepackage{zxjatype}
+- \usepackage[ipa]{zxjafont}
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+    \lhead{momozuka@gmail.com} %ヘッダ左
+documentclass: bxjsarticle
+# classoption: xelatex,ja=standard
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# レンジ
+
+## 必要なライブラリをインストールする
+
+下の行はconsoleで実行すると良い。
+
+```
+#console
+install.packages("tidyverse")
+
+```
+
+
+## 必要なライブラリを読み込む
+
+```{r results = "hide", message = FALSE}
+# code
+library(tidyverse)
+library(systemfonts)
+library(ragg)
+```
+
+
+## レンジとは何かを知る (テキスト4.1)
+
+> 「レンジ(range) とは範囲という意味です。その名のとおり、データが分布している範囲です。レンジはデータの最大値から最小値を引いて求めることができます。」
+
+
+## 各月のクレーム件数 (表4.1)
+
+各月のクレーム件数をCSVファイルにしてアップロードする。
+
+ファイル名の例: `zenki_chap_04_01_utf8.csv`
+
+CSVファイルの中身は以下の通り。
+
+```
+
+month,claim_count
+1月,30
+2月,20
+3月,40
+4月,90
+（以下省略）
+```
+
+
+
+`read_csv()`で読み込む。
+
+
+```{r}
+# code
+df_claim <- read_csv("zenki_chap_04_01_utf8.csv")
+df_claim
+```
+
+データフレームの中身を確認する。
+
+```{r}
+# code
+glimpse(df_claim)
+```
+
+変数の型を確認する
+
+```{r}
+# code
+class(df_claim)
+```
+
+```{r}
+# code
+class(df_claim$month)
+```
+
+
+```{r}
+# code
+class(df_claim$claim_count)
+```
+
+
+
+
+## 降順
+
+各月のクレーム件数を降順にしてみる。
+
+`arrange()`関数と`desc()`関数を組み合わせて用いる。
+
+- `arrange()`: データフレームを指定した列の値に基づいて並び替える。（ウィッカム 2024: 38-39）
+- `desc()`: 引数の列を降順に指定する。（ウィッカム 2024: 39）
+
+
+```{r}
+# code
+df_claim |>
+  arrange(desc(claim_count))
+```
+
+claim_countの降順にデータの並べ替えが行われたのがわかる。
+
+> 「最大値は5月の「100」、最小値は11月の「10」です。つまり、このデータのレンジは以下の式で「90」と求めることができます。」
+
+$100 - 10 = 90$
+
+
+Rで一応計算しておく。
+
+```{r}
+# code
+100 - 10
+```
+
+
+## レンジを求める （4.2）
+
+### CSVファイルの作成
+
+Excelで各月の受注数のCSVファイルを作成する。
+
+CSVファイル名の例: `zenki_chap_04_02_utf8.csv`
+
+CSVファイルの中身
+
+```
+
+month,order_count
+1月,340
+2月,400
+3月,560
+(以下省略)
+```
+
+### CSVファイルのアップロード
+
+RStudioにファイルをアップロードする。
+
+### CSVファイルの読み込み
+
+`read_csv()`で読み込む。
+
+```{r}
+# code
+df_count <- read_csv("zenki_chap_04_02_utf8.csv")
+df_count
+```
+
+## レンジを求める
+
+### 最大値と最小値からレンジを求める
+
+- `max()`: 最大値を求める関数
+
+```{r}
+# code
+max(df_count$order_count)
+```
+
+- `min()`: 最小値を求める関数
+
+```{r}
+# code
+min(df_count$order_count)
+```
+
+レンジを求める。最大値から最小値を引く。
+
+```{r}
+# code
+max(df_count$order_count) - min(df_count$order_count)
+```
+
+### range()関数を使うやり方
+
+Rには最大値と最小値を一度に計算する関数`range()`がある。
+
+- `range()`:値列の最小値と最大値をベクトルとして返す
+- `diff()`: 差分を計算する
+
+```{r}
+# code
+range(df_count$order_count)
+```
+
+
+
+```{r}
+# code
+range(df_count$order_count) |>
+  diff()
+```
+
+
+### summarize()関数を使う方法
+
+```{r}
+# code
+df_count |>
+  summarize(
+    count_min = min(order_count),
+    count_max = max(order_count),
+    count_range = count_max - count_min
+  )
+```
+
+\newpage
+
+## 章末問題
+
+### 問題
+
+ > 「以下のデータは、ある店の1年間の来店者数を表しています。このデータのレンジを求めてください。」
+
+
+\newpage
+
+### 解答例
+
+CSVファイルを作成する。
+
+CSVファイル名の例: `zenki_chap_04_shoumatu.csv`
+
+CSVファイルの中身
+
+```
+
+month,visitor_count
+1,560
+2,320
+3,624
+（以下省略）
+```
+
+CSVファイルの読み込み。
+
+```{r}
+# code
+df_visitor <- read_csv("zenki_chap_04_shoumatu.csv")
+df_visitor
+```
+
+```{r}
+# code
+max(df_visitor$visitor_count) - min(df_visitor$visitor_count)
+```
+
+又は
+
+```{r}
+# code
+range(df_visitor$visitor_count) |>
+  diff()
+```
+
+\newpage
+
+
+
+## テキストと参考文献
+
+### テキスト
+
+- 玄場公規, 湊宣明, 豊田裕貴, 2016, 『Excel で学ぶ ビジネスデータ分析の基礎ビジネス統計スペシャリスト・エクセル分析ベーシック対応』, オデッセイコミュニケーションズ. 
+
+
+### 参考文献
+
+- ウィッカム, 2024, 『Rではじめるデータサイエンス第2版』, オライリー・ジャパン.
+
+
+
+
+
+
